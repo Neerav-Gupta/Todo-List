@@ -137,11 +137,12 @@
 
     const onDropOutside = (event) => {
         const todoText = event.dataTransfer.getData("text/plain");
+        let tempTodo = {};
         containers.update((currentContainers) => {
             const updatedContainers = currentContainers.map((container) => {
                 if (container.todos.some((todo) => todo.text === todoText)) {
                     const updatedTodos = container.todos.filter(
-                        (todo) => todo.text !== todoText,
+                        (todo) => {if (todo.text === todoText) tempTodo = todo; return todo.text !== todoText},
                     );
                     container.todos = updatedTodos;
                 }
@@ -157,11 +158,11 @@
                 return current;
             }
             const movedTodo = {
-                text: todoText,
-                checked: false,
-                priority: "Low",
-                date: "",
-                time: "",
+                text: tempTodo.text,
+                checked: tempTodo.checked,
+                priority: tempTodo.priority,
+                date: tempTodo.date,
+                time: tempTodo.time,
             };
             return [...current, movedTodo];
         });
@@ -232,6 +233,10 @@
             {/if}
         </div>
     {/each}
+    
+    {#if $containers.length > 0}
+        <hr class="divider" />
+    {/if}
 
     <!-- svelte-ignore a11y_no_static_element_interactions -->
     <div
@@ -268,8 +273,8 @@
     .container {
         border: 1px dashed #ccc;
         margin-bottom: 1rem;
-        height: 3rem;
         padding-left: 1rem;
+        padding-right: 2rem;
     }
 
     .container-header {
